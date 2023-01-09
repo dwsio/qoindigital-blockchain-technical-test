@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <title>Voter Panel</title>
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Josefin+Sans:400,600);
+      body {
+        background: #fff;
+        color: #000;
+        font-family: "Josefin Sans", sans-serif;
+        font-size: 100%;
+        padding: 3em 0;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
+    <script src="./bundle.js"></script>
+  </head>
+  <body class="container">
+    <div class="col-sm-10">
+      <h1>
+        <span style="color: rgb(0, 0, 255)">SCL</span> Online Voting Platform
+      </h1>
+      <h2>Voter Panel</h2>
+      <br />
+
+      <div class="row">
+        <input
+          type="button"
+          class="col col-sm-3 btn btn-light"
+          disabled
+          id="phase1"
+          value="1. SETUP"
+        />
+
+        <input
+          type="button"
+          class="col col-sm-3 btn btn-light"
+          disabled
+          id="phase2"
+          value="2. REGISTER"
+        />
+
+        <input
+          type="button"
+          class="col col-sm-3 btn btn-light"
+          disabled
+          id="phase3"
+          value="3. CAST"
+        />
+
+        <input
+          type="button"
+          class="col col-sm-3 btn btn-light"
+          disabled
+          id="phase4"
+          value="4. TALLY"
+        />
+      </div>
+      <br />
+      <br />
+
+      <div class="table-responsive">
+        <p
+          id="alertPanel"
+          class="alert alert-info"
+          role="alert"
+          style="font-size: 14px"
+        >
+          Contract Status: <span id="contractStatus">Not clicked</span>
+        </p>
+        <table class="table table-bordered" style="font-size: 14px">
+          <thead>
+            <tr>
+              <th style="background-color: rgb(255, 255, 255)">Account:</th>
+              <th style="background-color: rgb(255, 255, 255)">
+                <span id="accountVal" style="font-weight: normal"></span>
+              </th>
+            </tr>
+            <tr>
+              <th style="background-color: rgb(255, 255, 255)">Balance:</th>
+              <th style="background-color: rgb(255, 255, 255)">
+                <span id="balanceVal" style="font-weight: normal"></span>
+              </th>
+            </tr>
+            <tr>
+              <th style="background-color: rgb(255, 255, 255)">ChainId:</th>
+              <th style="background-color: rgb(255, 255, 255)">
+                <span id="chainIdVal" style="font-weight: normal"></span>
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            id="candidate-rows"
+            style="background-color: rgb(255, 255, 255)"
+          ></tbody>
+        </table>
+      </div>
+
+      <div id="setupDiv" hidden>
+        <br />
+        <h2>Connect to Ongoing Voting</h2>
+        <br />
+
+        <label for="contractAddrVal" style="font-size: 16px; font-weight: bold"
+          >Enter voting contract address:</label
+        ><br />
+        <label
+          for="contractAddrVal"
+          style="font-size: 14px; font-weight: normal"
+          >The voting contract address is shared by the admin to the voters.
+        </label>
+        <br />
+        <input
+          id="contractAddrVal"
+          style="width: 400px; height: 2em; font-size: 14px"
+          type="text"
+        /><br /><br />
+
+        <label for="accountAddrVal" style="font-size: 16px; font-weight: bold"
+          >Enter your account address:</label
+        ><br />
+        <label for="accountAddrVal" style="font-size: 14px; font-weight: normal"
+          >Enter your account that has been identified as an eligible voter.
+        </label>
+        <br />
+        <input
+          id="accountAddrVal"
+          style="width: 400px; height: 2em; font-size: 14px"
+          type="text"
+        /><br /><br />
+        <div class="col">
+          <button class="btn btn-primary" id="connectBtn">Connect</button>
+        </div>
+        <br />
+      </div>
+
+      <div id="registerDiv" hidden>
+        <br />
+        <h2>Voter Registration</h2>
+        <br />
+        <br />
+      </div>
+
+      <div id="castDiv" hidden>
+        <br />
+        <h2>Choose your Vote:</h2>
+        <br />
+        <label for="questionStr" style="font-size: 16px; font-weight: normal"
+          >The Voting Candidates are:</label
+        ><br />
+        <input
+          id="questionStr"
+          style="width: 400px; height: 2em; font-size: 14px"
+          type="text"
+        /><br /><br />
+
+        <label for="voteBox" style="font-size: 16px; font-weight: bold"
+          >Enter your choice:</label
+        ><br />
+        <label for="voteBox" style="font-size: 14px; font-weight: normal"
+          >Enter a number of your choice, start from 0.
+        </label>
+        <br />
+        <input
+          id="voteBox"
+          style="width: 400px; height: 2em; font-size: 14px"
+          type="text"
+        />
+        <br />
+        <br />
+        <div class="col">
+          <button class="btn btn-primary" id="submitBtn">Submit Vote</button>
+        </div>
+      </div>
+
+      <div id="tallyDiv" hidden>
+        <br />
+        <h2>Voting Result</h2>
+        <br />
+        <button class="btn btn-primary" id="computeBtn">Get Result</button>
+        <br />
+        <br />
+        <br />
+        <label for="voteRes" style="font-size: 16px; font-weight: normal"
+          >Voting result:</label
+        ><br />
+        <canvas
+          id="resultChart"
+          style="width: 100%; max-width: 400px; max-height: 500px"
+        ></canvas>
+      </div>
+    </div>
+  </body>
+</html>

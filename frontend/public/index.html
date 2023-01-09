@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>First page</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Josefin+Sans:400,600);
+      *,
+      *:before,
+      *:after {
+      }
+
+      body {
+        background: #fff;
+        color: #000;
+        font-family: "Josefin Sans", sans-serif;
+        font-size: 100%;
+        padding: 3em 0;
+      }
+      .separator {
+        width: 30%;
+      }
+
+      .title {
+        margin-top: 100px;
+        margin-bottom: 10px;
+      }
+      .title h1 .colorOne {
+        color: #ff4500;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .title hr {
+        width: 75%;
+      }
+
+      .container {
+        text-align: center;
+      }
+
+      .main {
+        max-width: 1140px;
+        margin: 0 auto;
+      }
+
+      .mainly {
+        margin: 1em 0.5em 1.625em;
+        font-family: "Josefin Sans", sans-serif;
+        font-weight: 400;
+        line-height: 1.65;
+        color: #000;
+        text-align: center;
+      }
+      @media (min-width: 40em) {
+        .mainly {
+          display: inline;
+          float: left;
+          width: 50%;
+          margin: 1em 0 0;
+        }
+
+        .mainly.order {
+          float: left;
+          border-left: none;
+        }
+      }
+      .mainly h4 {
+        margin: 0.25em 0 0;
+        font-size: 170%;
+        font-weight: normal;
+      }
+      .mainly .features {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+        color: #999999;
+      }
+      .mainly li {
+        padding: 0.35em 0;
+      }
+      .mainly .continue {
+        margin: 1em 0 0;
+      }
+      .mainly button {
+        padding: 1em 3.25em;
+        border: none;
+        border-radius: 40px;
+        background: #292b2e;
+        color: #f9f9f9;
+        cursor: pointer;
+      }
+    </style>
+    <script type="text/javascript">
+      window.onload = function () {
+        document.getElementById("adminButton").onclick = () => {
+          location.href = "http://localhost:5000/admin/index.html";
+        };
+        document.getElementById("voterButton").onclick = () => {
+          location.href = "http://localhost:5000/voter/index.html";
+        };
+      };
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div>
+          <div class="title text-center">
+            <h1><span class="colorOne">SCL</span> Online Voting Platform</h1>
+            <h3>Please choose your role and continue</h3>
+            <hr />
+          </div>
+          <div class="main">
+            <div class="mainly order">
+              <h4>Admin</h4>
+              <ul class="features">
+                <li>Admin can set up voting contract, manage</li>
+                <li>voter, manage voting pahse and compute the tally</li>
+                <li class="continue">
+                  <button id="adminButton">Continue</button>
+                </li>
+              </ul>
+            </div>
+            <div class="mainly order">
+              <h4>Voter</h4>
+              <ul class="features">
+                <li>Voters can submit their vote to</li>
+                <li>the deployed voting smart contract</li>
+                <li class="continue">
+                  <button id="voterButton">Continue</button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
