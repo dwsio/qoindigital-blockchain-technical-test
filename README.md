@@ -23,10 +23,10 @@
 
 **Screenshots**
 
-![ALT](/images/1.PNG)
-![ALT](/images/2.PNG)
-![ALT](/images/3.PNG)
-![ALT](/images/4.PNG)
-![ALT](/images/5.PNG)
-![ALT](/images/6.PNG)
-![ALT](/images/7.PNG)
+![ALT](/img/1.PNG)
+![ALT](/img/2.PNG)
+![ALT](/img/3.PNG)
+![ALT](/img/4.PNG)
+![ALT](/img/5.PNG)
+![ALT](/img/6.PNG)
+![ALT](/img/7.PNG)
