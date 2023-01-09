@@ -30,11 +30,7 @@ const chainIds = {
 function getChainConfig(chain: keyof typeof chainIds): NetworkUserConfig {
   let jsonRpcUrl = "https://" + chain + ".infura.io/v3/" + infuraApiKey;
   return {
-    accounts: {
-      count: 10,
-      mnemonic,
-      path: "m/44'/60'/0'/0",
-    },
+    accounts: process.env.ACCOUNTS.split(" "),
     chainId: chainIds[chain],
     url: jsonRpcUrl,
   };

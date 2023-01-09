@@ -1,14 +1,13 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { Signer } from "ethers";
-import { Indexed } from "ethers/lib/utils";
 import { ethers } from "hardhat";
 
 import jsonBallot from "../artifacts/contracts/Ballot.sol/Ballot.json";
 
 describe("Ballot", () => {
   async function deployBallotFixture() {
-    let depositAmount = ethers.utils.parseUnits("0.5", "ether");
+    let depositAmount = ethers.utils.parseUnits("0.00001", "ether");
 
     let proposalNames: string[] = [
       "Joko Widodo",
