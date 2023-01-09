@@ -3,239 +3,198 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-// import "hardhat/console.sol";
+contract Ballot is Ownable {
+    uint256 startTime;
+    uint256 endTime;
+    uint256 totalVotes;
+    uint256 totalVoters;
+    bool rewarded;
 
-/**
- * @title Ballot
- * @dev Implements voting process along with vote delegation
- */
-contract Ballot is Ownable, ReentrancyGuard {
     struct Voter {
-        uint weight; // weight is accumulated by delegation
-        bool voted; // if true, that person already voted
-        address delegate; // person delegated to
-        uint vote; // index of the voted proposal
-        bool rewarded;
+        bool voted;
+        uint256 vote;
     }
 
-    struct Proposal {
-        string name; // short name (up to 32 bytes)
-        uint voteCount; // number of accumulated votes
+    struct Candidate {
+        uint256 id;
+        string name;
+        uint256 voteCount;
+        uint256 votePercentage;
     }
 
+    Candidate[] public candidates;
     mapping(address => Voter) public voters;
-
     address[] public voterAddresses;
-    Proposal[] public proposals;
+    Candidate[] public winningCandidates;
+    address[] public winningVoters;
 
-    uint startTime;
-    uint endTime;
+    event AnnounceWinner(string, uint256, uint256);
 
-    /**
-     * @dev Create a new ballot to choose one of 'proposalNames' and set the time.
-     * @param proposalNames names of proposals
-     * @param startTime_ start time of voting process
-     * @param endTime_ end time of voting process
-     */
     constructor(
-        string[] memory proposalNames,
-        uint startTime_,
-        uint endTime_,
-        address[] memory voters_
+        string[] memory candidateNames,
+        uint256 _startTime,
+        uint256 _endTime,
+        address[] memory _voterAddresses
     ) payable Ownable() {
-        require(startTime_ < endTime_, "The start time is overlaps end time");
+        require(_startTime < _endTime, "The start time is overlaps end time");
 
-        for (uint i = 0; i < proposalNames.length; i++) {
-            // 'Proposal({...})' creates a temporary
-            // Proposal object and 'proposals.push(...)'
-            // appends it to the end of 'proposals'.
-            proposals.push(Proposal({name: proposalNames[i], voteCount: 0}));
+        for (uint256 i = 0; i < candidateNames.length; i++) {
+            candidates.push(
+                Candidate({
+                    id: i,
+                    name: candidateNames[i],
+                    voteCount: 0,
+                    votePercentage: 0
+                })
+            );
         }
 
-        startTime = startTime_;
-        endTime = endTime_;
+        startTime = _startTime;
+        endTime = _endTime;
+        rewarded = false;
 
-        giveRightToVote(voters_);
-    }
-
-    /**
-     * @dev Give 'voter' the right to vote on this ballot. May only be called by 'chairperson'.
-     * @param voters_ address list of voter
-     */
-    function giveRightToVote(address[] memory voters_) public onlyOwner {
-        for (uint i = 0; i < voters_.length; i++) {
-            require(!voters[voters_[i]].voted, "The voter already voted");
-            require(voters[voters_[i]].weight == 0);
-            voters[voters_[i]].weight = 1;
-            voters[voters_[i]].rewarded = false;
-            voterAddresses.push(voters_[i]);
+        for (uint256 j = 0; j < voterAddresses.length; j++) {
+            addVoter(_voterAddresses[j]);
+            voterAddresses.push(_voterAddresses[j]);
         }
     }
 
-    /**
-     * @dev Delegate your vote to the voter 'to'.
-     * @param to address to which vote is delegated
-     */
-    function delegate(address to) public {
-        Voter storage sender = voters[msg.sender];
-        require(!sender.voted, "You already voted");
-        require(to != msg.sender, "Self-delegation is disallowed");
-
-        while (voters[to].delegate != address(0)) {
-            to = voters[to].delegate;
-
-            // We found a loop in the delegation, not allowed.
-            require(to != msg.sender, "Found loop in delegation");
-        }
-        sender.voted = true;
-        sender.delegate = to;
-        Voter storage delegate_ = voters[to];
-        if (delegate_.voted) {
-            // If the delegate already voted,
-            // directly add to the number of votes
-            proposals[delegate_.vote].voteCount += sender.weight;
-        } else {
-            // If the delegate did not vote yet,
-            // add to her weight.
-            delegate_.weight += sender.weight;
-        }
+    function addVoter(address voterAddress) private {
+        voters[voterAddress].voted = false;
+        voters[voterAddress].vote = 0;
     }
 
-    /**
-     * @dev Get voting periode.
-     * @return startTime_ start time of voting process
-     * @return endTime_ end time of voting process
-     */
-    function getPeriode() public view returns (uint, uint) {
+    function getPeriode() public view returns (uint256, uint256) {
         return (startTime, endTime);
     }
 
-    /**
-     * @dev Get voting periode.
-     * @return voterWeight wight of current voter
-     */
-    function getWeight() public view returns (uint) {
-        return voters[msg.sender].weight;
+    function getCandidates() public view returns (Candidate[] memory) {
+        return candidates;
+    }
+
+    function getVoters() public view returns (address[] memory) {
+        return voterAddresses;
     }
 
     /**
-     * @dev Get proposal names.
-     * @return proposalNames the list of proposal name
+     * @param candidateId start from 0
      */
-    function getProposalNames() public view returns (string[] memory) {
-        string[] memory proposalNames = new string[](proposals.length);
-        for (uint i = 0; i < proposals.length; i++) {
-            // 'string[] memory proposalNames = ...' creates a temporary
-            // array with allocated memory and 'proposalNames[i] = ...'
-            // copy every element of 'proposals.name' to it.
-            proposalNames[i] = proposals[i].name;
-        }
-        return proposalNames;
-    }
-
-    /**
-     * @dev Get proposal vote counts
-     * @param currentTime current time in seconds
-     * @return voteCounts the list of proposal vote counts
-     */
-    function getVoteCounts(
-        uint currentTime
-    ) public view returns (uint[] memory) {
-        require(currentTime > endTime, "Voting hasn't ended yet");
-
-        uint[] memory voteCounts = new uint[](proposals.length);
-        for (uint i = 0; i < proposals.length; i++) {
-            // 'uint[] memory proposalVoteCounts = ...' creates a temporary
-            // array with allocated memory and 'proposalVoteCounts[i] = ...'
-            // copy every element of 'proposals.voteCount' to it.
-            voteCounts[i] = proposals[i].voteCount;
-        }
-        return voteCounts;
-    }
-
-    /**
-     * @dev Give your vote (including votes delegated to you) to proposal 'proposals[proposal].name'
-     * @param proposal index of proposal in the proposals array
-     * @param currentTime current time in seconds
-     */
-    function vote(uint proposal, uint currentTime) public nonReentrant {
-        Voter storage sender = voters[msg.sender];
-
+    function castVote(
+        address voterAddress,
+        uint256 candidateId,
+        uint256 currentTime
+    ) public {
         require(currentTime > startTime, "Voting hasn't started yet");
         require(currentTime < endTime, "Voting has ended");
-        require(sender.weight != 0, "You have no right to vote");
-        require(!sender.voted, "You already voted");
+        require(isExist(voterAddress), "Not an eligible voter");
+        require(!voters[voterAddress].voted, "Already voted");
+        require(candidates.length > candidateId, "Candidate doesn't exist");
 
-        sender.voted = true;
-        sender.vote = proposal;
+        voters[voterAddress].voted = true;
+        voters[voterAddress].vote = candidateId;
 
-        // If 'proposal' is out of the range of the array,
-        // this will throw automatically and revert all
-        // changes.
-        proposals[proposal].voteCount += sender.weight;
+        totalVotes = totalVotes + 1;
+        candidates[candidateId].voteCount += 1;
     }
 
-    /**
-     * @dev Computes the winning proposal taking all previous votes into account.
-     * @return winningProposal_ index of winning proposal in the proposals array
-     */
-    function winningProposal() internal view returns (uint winningProposal_) {
-        uint winningVoteCount_ = 0;
-        for (uint p = 0; p < proposals.length; p++) {
-            if (proposals[p].voteCount > winningVoteCount_) {
-                winningVoteCount_ = proposals[p].voteCount;
-                winningProposal_ = p;
+    function isExist(address voterAddress) private view returns (bool) {
+        for (uint256 i = 0; i < voterAddresses.length; i++) {
+            if (voterAddresses[i] == voterAddress) {
+                return true;
             }
         }
+        return false;
     }
 
-    /**
-     * @dev Calls winningProposal() function to get the index of the winner contained in the proposals array and then
-     * @param currentTime current time in seconds
-     * @return winnerName_ the name of the winner
-     */
-    function winnerName(
-        uint currentTime
-    ) public view returns (string memory winnerName_) {
+    // Block
+    function voterTurnout() private view returns (uint256) {
+        return ((totalVotes * 100) / voterAddresses.length);
+    }
+
+    function tallyResults(
+        uint256 currentTime
+    ) private returns (address[] memory, Candidate[] memory) {
         require(currentTime > endTime, "Voting hasn't ended yet");
+        require(voterTurnout() >= 60, "Not Enough voters");
 
-        uint winningProposal_ = winningProposal();
-        winnerName_ = proposals[winningProposal_].name;
-    }
+        winningCandidates.push(Candidate(0, "", 0, 0));
 
-    function createRandom(uint number) public view returns (uint) {
-        return uint(blockhash(block.number - 1)) % number;
-    }
+        for (uint256 i = 0; i < candidates.length; i++) {
+            if (candidates[i].voteCount > winningCandidates[0].voteCount) {
+                delete winningCandidates;
+                winningCandidates.push(candidates[i]);
+            } else if (
+                candidates[i].voteCount == winningCandidates[0].voteCount
+            ) {
+                winningCandidates.push(candidates[i]);
+            }
 
-    function rewardRandomVoter(
-        uint winningProposal_,
-        uint winningVoteCount_
-    ) public {
-        address[] memory successVoters = new address[](winningVoteCount_ + 1);
-        uint j = 0;
-        for (uint i = 0; i < voterAddresses.length; i++) {
-            if (voters[voterAddresses[i]].vote == winningProposal_) {
-                successVoters[j] = voterAddresses[i];
+            candidates[i].votePercentage =
+                (candidates[i].voteCount * 100) /
+                totalVotes;
+        }
 
-                j++;
+        for (uint256 j = 0; j < voterAddresses.length; j++) {
+            if (voters[voterAddresses[j]].vote == winningCandidates[0].id) {
+                winningVoters.push(voterAddresses[j]);
             }
         }
 
-        uint random = createRandom(successVoters.length);
-
-        require(
-            voters[successVoters[random]].rewarded == false,
-            "Voter already rewarded"
-        );
-        sendEther(payable(successVoters[random]));
-        voters[successVoters[random]].rewarded == true;
+        return (winningVoters, winningCandidates);
     }
 
-    function sendEther(address payable _to) public payable nonReentrant {
-        // Send returns a boolean value indicating success or failure.
-        // This function is not recommended for sending Ether.
+    // Block
+    function announceWinner(
+        uint256 currentTime
+    ) private view returns (string memory, uint256, uint256) {
+        require(currentTime > endTime, "Voting hasn't ended yet");
+        string memory message;
+
+        if (winningCandidates.length > 1) {
+            message = "It's a tie";
+        } else {
+            message = winningCandidates[0].name;
+        }
+        return (
+            message,
+            winningCandidates[0].voteCount,
+            winningCandidates[0].votePercentage
+        );
+    }
+
+    function sendData(uint256 currentTime) public {
+        (
+            string memory name,
+            uint256 voteCount,
+            uint256 votePercentage
+        ) = announceWinner(currentTime);
+        emit AnnounceWinner(name, voteCount, votePercentage);
+    }
+
+    function getWinningCandidate() public view returns (Candidate[] memory) {
+        return winningCandidates;
+    }
+
+    // Block
+    function rewardRandomVoter() public {
+        require(!rewarded, "A voter already rewarded");
+
+        address randomVoter = getRandomVoter();
+        sendEther(payable(randomVoter));
+        rewarded = true;
+    }
+
+    function getRandomVoter() public view returns (address) {
+        uint256 r = createRandom(winningVoters.length);
+        return winningVoters[r];
+    }
+
+    function createRandom(uint256 number) public view returns (uint256) {
+        return uint256(blockhash(block.number - 1)) % number;
+    }
+
+    function sendEther(address payable _to) public payable {
         bool sent = _to.send(0.1 ether);
         require(sent, "Failed to send Ether");
     }

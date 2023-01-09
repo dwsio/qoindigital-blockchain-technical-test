@@ -28,85 +28,116 @@ import type {
   PromiseOrValue,
 } from "../common";
 
+export declare namespace Ballot {
+  export type CandidateStruct = {
+    id: PromiseOrValue<BigNumberish>;
+    name: PromiseOrValue<string>;
+    voteCount: PromiseOrValue<BigNumberish>;
+    votePercentage: PromiseOrValue<BigNumberish>;
+  };
+
+  export type CandidateStructOutput = [
+    BigNumber,
+    string,
+    BigNumber,
+    BigNumber
+  ] & {
+    id: BigNumber;
+    name: string;
+    voteCount: BigNumber;
+    votePercentage: BigNumber;
+  };
+}
+
 export interface BallotInterface extends utils.Interface {
   functions: {
+    "candidates(uint256)": FunctionFragment;
+    "castVote(address,uint256,uint256)": FunctionFragment;
     "createRandom(uint256)": FunctionFragment;
-    "delegate(address)": FunctionFragment;
+    "getCandidates()": FunctionFragment;
     "getPeriode()": FunctionFragment;
-    "getProposalNames()": FunctionFragment;
-    "getVoteCounts(uint256)": FunctionFragment;
-    "getWeight()": FunctionFragment;
-    "giveRightToVote(address[])": FunctionFragment;
+    "getRandomVoter()": FunctionFragment;
+    "getVoters()": FunctionFragment;
+    "getWinningCandidate()": FunctionFragment;
     "owner()": FunctionFragment;
-    "proposals(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "rewardRandomVoter(uint256,uint256)": FunctionFragment;
+    "rewardRandomVoter()": FunctionFragment;
+    "sendData(uint256)": FunctionFragment;
     "sendEther(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "vote(uint256,uint256)": FunctionFragment;
     "voterAddresses(uint256)": FunctionFragment;
     "voters(address)": FunctionFragment;
-    "winnerName(uint256)": FunctionFragment;
+    "winningCandidates(uint256)": FunctionFragment;
+    "winningVoters(uint256)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
+      | "candidates"
+      | "castVote"
       | "createRandom"
-      | "delegate"
+      | "getCandidates"
       | "getPeriode"
-      | "getProposalNames"
-      | "getVoteCounts"
-      | "getWeight"
-      | "giveRightToVote"
+      | "getRandomVoter"
+      | "getVoters"
+      | "getWinningCandidate"
       | "owner"
-      | "proposals"
       | "renounceOwnership"
       | "rewardRandomVoter"
+      | "sendData"
       | "sendEther"
       | "transferOwnership"
-      | "vote"
       | "voterAddresses"
       | "voters"
-      | "winnerName"
+      | "winningCandidates"
+      | "winningVoters"
   ): FunctionFragment;
 
+  encodeFunctionData(
+    functionFragment: "candidates",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "castVote",
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
+  ): string;
   encodeFunctionData(
     functionFragment: "createRandom",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "delegate",
-    values: [PromiseOrValue<string>]
+    functionFragment: "getCandidates",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getPeriode",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getProposalNames",
+    functionFragment: "getRandomVoter",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "getVoters", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getVoteCounts",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(functionFragment: "getWeight", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "giveRightToVote",
-    values: [PromiseOrValue<string>[]]
+    functionFragment: "getWinningCandidate",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "proposals",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "rewardRandomVoter",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "sendData",
+    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "sendEther",
@@ -117,10 +148,6 @@ export interface BallotInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "vote",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "voterAddresses",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
@@ -129,31 +156,35 @@ export interface BallotInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "winnerName",
+    functionFragment: "winningCandidates",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "winningVoters",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
 
+  decodeFunctionResult(functionFragment: "candidates", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "castVote", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "createRandom",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "delegate", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getCandidates",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getPeriode", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getProposalNames",
+    functionFragment: "getRandomVoter",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getVoters", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getVoteCounts",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "getWeight", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "giveRightToVote",
+    functionFragment: "getWinningCandidate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "proposals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -162,25 +193,46 @@ export interface BallotInterface extends utils.Interface {
     functionFragment: "rewardRandomVoter",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "sendData", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "sendEther", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "vote", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "voterAddresses",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "voters", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "winnerName", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "winningCandidates",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "winningVoters",
+    data: BytesLike
+  ): Result;
 
   events: {
+    "AnnounceWinner(string,uint256,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AnnounceWinner"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
+
+export interface AnnounceWinnerEventObject {
+  arg0: string;
+  arg1: BigNumber;
+  arg2: BigNumber;
+}
+export type AnnounceWinnerEvent = TypedEvent<
+  [string, BigNumber, BigNumber],
+  AnnounceWinnerEventObject
+>;
+
+export type AnnounceWinnerEventFilter = TypedEventFilter<AnnounceWinnerEvent>;
 
 export interface OwnershipTransferredEventObject {
   previousOwner: string;
@@ -221,46 +273,56 @@ export interface Ballot extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    candidates(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, string, BigNumber, BigNumber] & {
+        id: BigNumber;
+        name: string;
+        voteCount: BigNumber;
+        votePercentage: BigNumber;
+      }
+    >;
+
+    castVote(
+      voterAddress: PromiseOrValue<string>,
+      candidateId: PromiseOrValue<BigNumberish>,
+      currentTime: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     createRandom(
       number: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    delegate(
-      to: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+    getCandidates(
+      overrides?: CallOverrides
+    ): Promise<[Ballot.CandidateStructOutput[]]>;
 
     getPeriode(overrides?: CallOverrides): Promise<[BigNumber, BigNumber]>;
 
-    getProposalNames(overrides?: CallOverrides): Promise<[string[]]>;
+    getRandomVoter(overrides?: CallOverrides): Promise<[string]>;
 
-    getVoteCounts(
-      currentTime: PromiseOrValue<BigNumberish>,
+    getVoters(overrides?: CallOverrides): Promise<[string[]]>;
+
+    getWinningCandidate(
       overrides?: CallOverrides
-    ): Promise<[BigNumber[]]>;
-
-    getWeight(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    giveRightToVote(
-      voters_: PromiseOrValue<string>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<[Ballot.CandidateStructOutput[]]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
-
-    proposals(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { name: string; voteCount: BigNumber }>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     rewardRandomVoter(
-      winningProposal_: PromiseOrValue<BigNumberish>,
-      winningVoteCount_: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    sendData(
+      currentTime: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -274,12 +336,6 @@ export interface Ballot extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    vote(
-      proposal: PromiseOrValue<BigNumberish>,
-      currentTime: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     voterAddresses(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -288,62 +344,76 @@ export interface Ballot extends BaseContract {
     voters(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<[boolean, BigNumber] & { voted: boolean; vote: BigNumber }>;
+
+    winningCandidates(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<
-      [BigNumber, boolean, string, BigNumber, boolean] & {
-        weight: BigNumber;
-        voted: boolean;
-        delegate: string;
-        vote: BigNumber;
-        rewarded: boolean;
+      [BigNumber, string, BigNumber, BigNumber] & {
+        id: BigNumber;
+        name: string;
+        voteCount: BigNumber;
+        votePercentage: BigNumber;
       }
     >;
 
-    winnerName(
-      currentTime: PromiseOrValue<BigNumberish>,
+    winningVoters(
+      arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<[string] & { winnerName_: string }>;
+    ): Promise<[string]>;
   };
+
+  candidates(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, string, BigNumber, BigNumber] & {
+      id: BigNumber;
+      name: string;
+      voteCount: BigNumber;
+      votePercentage: BigNumber;
+    }
+  >;
+
+  castVote(
+    voterAddress: PromiseOrValue<string>,
+    candidateId: PromiseOrValue<BigNumberish>,
+    currentTime: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   createRandom(
     number: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  delegate(
-    to: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  getCandidates(
+    overrides?: CallOverrides
+  ): Promise<Ballot.CandidateStructOutput[]>;
 
   getPeriode(overrides?: CallOverrides): Promise<[BigNumber, BigNumber]>;
 
-  getProposalNames(overrides?: CallOverrides): Promise<string[]>;
+  getRandomVoter(overrides?: CallOverrides): Promise<string>;
 
-  getVoteCounts(
-    currentTime: PromiseOrValue<BigNumberish>,
+  getVoters(overrides?: CallOverrides): Promise<string[]>;
+
+  getWinningCandidate(
     overrides?: CallOverrides
-  ): Promise<BigNumber[]>;
-
-  getWeight(overrides?: CallOverrides): Promise<BigNumber>;
-
-  giveRightToVote(
-    voters_: PromiseOrValue<string>[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<Ballot.CandidateStructOutput[]>;
 
   owner(overrides?: CallOverrides): Promise<string>;
-
-  proposals(
-    arg0: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { name: string; voteCount: BigNumber }>;
 
   renounceOwnership(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   rewardRandomVoter(
-    winningProposal_: PromiseOrValue<BigNumberish>,
-    winningVoteCount_: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  sendData(
+    currentTime: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -357,12 +427,6 @@ export interface Ballot extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  vote(
-    proposal: PromiseOrValue<BigNumberish>,
-    currentTime: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   voterAddresses(
     arg0: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -371,60 +435,72 @@ export interface Ballot extends BaseContract {
   voters(
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
+  ): Promise<[boolean, BigNumber] & { voted: boolean; vote: BigNumber }>;
+
+  winningCandidates(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
   ): Promise<
-    [BigNumber, boolean, string, BigNumber, boolean] & {
-      weight: BigNumber;
-      voted: boolean;
-      delegate: string;
-      vote: BigNumber;
-      rewarded: boolean;
+    [BigNumber, string, BigNumber, BigNumber] & {
+      id: BigNumber;
+      name: string;
+      voteCount: BigNumber;
+      votePercentage: BigNumber;
     }
   >;
 
-  winnerName(
-    currentTime: PromiseOrValue<BigNumberish>,
+  winningVoters(
+    arg0: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
 
   callStatic: {
+    candidates(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, string, BigNumber, BigNumber] & {
+        id: BigNumber;
+        name: string;
+        voteCount: BigNumber;
+        votePercentage: BigNumber;
+      }
+    >;
+
+    castVote(
+      voterAddress: PromiseOrValue<string>,
+      candidateId: PromiseOrValue<BigNumberish>,
+      currentTime: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     createRandom(
       number: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    delegate(
-      to: PromiseOrValue<string>,
+    getCandidates(
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<Ballot.CandidateStructOutput[]>;
 
     getPeriode(overrides?: CallOverrides): Promise<[BigNumber, BigNumber]>;
 
-    getProposalNames(overrides?: CallOverrides): Promise<string[]>;
+    getRandomVoter(overrides?: CallOverrides): Promise<string>;
 
-    getVoteCounts(
-      currentTime: PromiseOrValue<BigNumberish>,
+    getVoters(overrides?: CallOverrides): Promise<string[]>;
+
+    getWinningCandidate(
       overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
-
-    getWeight(overrides?: CallOverrides): Promise<BigNumber>;
-
-    giveRightToVote(
-      voters_: PromiseOrValue<string>[],
-      overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<Ballot.CandidateStructOutput[]>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
-    proposals(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { name: string; voteCount: BigNumber }>;
-
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    rewardRandomVoter(
-      winningProposal_: PromiseOrValue<BigNumberish>,
-      winningVoteCount_: PromiseOrValue<BigNumberish>,
+    rewardRandomVoter(overrides?: CallOverrides): Promise<void>;
+
+    sendData(
+      currentTime: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -438,12 +514,6 @@ export interface Ballot extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    vote(
-      proposal: PromiseOrValue<BigNumberish>,
-      currentTime: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     voterAddresses(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -452,23 +522,38 @@ export interface Ballot extends BaseContract {
     voters(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<[boolean, BigNumber] & { voted: boolean; vote: BigNumber }>;
+
+    winningCandidates(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<
-      [BigNumber, boolean, string, BigNumber, boolean] & {
-        weight: BigNumber;
-        voted: boolean;
-        delegate: string;
-        vote: BigNumber;
-        rewarded: boolean;
+      [BigNumber, string, BigNumber, BigNumber] & {
+        id: BigNumber;
+        name: string;
+        voteCount: BigNumber;
+        votePercentage: BigNumber;
       }
     >;
 
-    winnerName(
-      currentTime: PromiseOrValue<BigNumberish>,
+    winningVoters(
+      arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
   };
 
   filters: {
+    "AnnounceWinner(string,uint256,uint256)"(
+      arg0?: null,
+      arg1?: null,
+      arg2?: null
+    ): AnnounceWinnerEventFilter;
+    AnnounceWinner(
+      arg0?: null,
+      arg1?: null,
+      arg2?: null
+    ): AnnounceWinnerEventFilter;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: PromiseOrValue<string> | null,
       newOwner?: PromiseOrValue<string> | null
@@ -480,46 +565,45 @@ export interface Ballot extends BaseContract {
   };
 
   estimateGas: {
+    candidates(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    castVote(
+      voterAddress: PromiseOrValue<string>,
+      candidateId: PromiseOrValue<BigNumberish>,
+      currentTime: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     createRandom(
       number: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    delegate(
-      to: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
+    getCandidates(overrides?: CallOverrides): Promise<BigNumber>;
 
     getPeriode(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getProposalNames(overrides?: CallOverrides): Promise<BigNumber>;
+    getRandomVoter(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getVoteCounts(
-      currentTime: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    getVoters(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getWeight(overrides?: CallOverrides): Promise<BigNumber>;
-
-    giveRightToVote(
-      voters_: PromiseOrValue<string>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
+    getWinningCandidate(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    proposals(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     rewardRandomVoter(
-      winningProposal_: PromiseOrValue<BigNumberish>,
-      winningVoteCount_: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    sendData(
+      currentTime: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -533,12 +617,6 @@ export interface Ballot extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    vote(
-      proposal: PromiseOrValue<BigNumberish>,
-      currentTime: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     voterAddresses(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -549,53 +627,59 @@ export interface Ballot extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    winnerName(
-      currentTime: PromiseOrValue<BigNumberish>,
+    winningCandidates(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    winningVoters(
+      arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    candidates(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    castVote(
+      voterAddress: PromiseOrValue<string>,
+      candidateId: PromiseOrValue<BigNumberish>,
+      currentTime: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     createRandom(
       number: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    delegate(
-      to: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
+    getCandidates(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getPeriode(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getProposalNames(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getRandomVoter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getVoteCounts(
-      currentTime: PromiseOrValue<BigNumberish>,
+    getVoters(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getWinningCandidate(
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getWeight(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    giveRightToVote(
-      voters_: PromiseOrValue<string>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    proposals(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     rewardRandomVoter(
-      winningProposal_: PromiseOrValue<BigNumberish>,
-      winningVoteCount_: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    sendData(
+      currentTime: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -609,12 +693,6 @@ export interface Ballot extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    vote(
-      proposal: PromiseOrValue<BigNumberish>,
-      currentTime: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     voterAddresses(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -625,8 +703,13 @@ export interface Ballot extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    winnerName(
-      currentTime: PromiseOrValue<BigNumberish>,
+    winningCandidates(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    winningVoters(
+      arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
