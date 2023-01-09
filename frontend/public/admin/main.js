@@ -242,13 +242,15 @@ const initialize = async () => {
         //compute the tally
         computeBtn.onclick = async () => {
           console.log(tx);
-          const voteCounts = await evoteContract.methods
-            .getVoteCounts(Date.now())
-            .send({
-              from: accounts[0],
-              gas: 3000000,
-              gasPrice: "20000000",
-            });
+          const voteCounts = await evoteContract.methods.getVoteCounts().send({
+            from: accounts[0],
+            gas: 3000000,
+            gasPrice: "20000000",
+          });
+
+          const candidateNames = await evoteContract.methods
+            .getCandidates()
+            .call();
           // create chart of voting result
           new Chart("resultChart", {
             type: "doughnut",
