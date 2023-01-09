@@ -2,11 +2,7 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-
-contract Ballot is Ownable {
-    uint256 startTime;
-    uint256 endTime;
+contract Ballot {
     uint256 totalVotes;
     uint256 totalVoters;
     bool rewarded;
@@ -28,17 +24,17 @@ contract Ballot is Ownable {
     address[] public voterAddresses;
     Candidate[] public winningCandidates;
     address[] public winningVoters;
+    uint256[] public voteCounts;
+    uint256[] public endPhases;
+    string[] public names;
 
     event AnnounceWinner(string, uint256, uint256);
 
     constructor(
         string[] memory candidateNames,
-        uint256 _startTime,
-        uint256 _endTime,
+        uint256[] memory _endPhases,
         address[] memory _voterAddresses
-    ) payable Ownable() {
-        require(_startTime < _endTime, "The start time is overlaps end time");
-
+    ) payable {
         for (uint256 i = 0; i < candidateNames.length; i++) {
             candidates.push(
                 Candidate({
@@ -48,10 +44,12 @@ contract Ballot is Ownable {
                     votePercentage: 0
                 })
             );
-        }
 
-        startTime = _startTime;
-        endTime = _endTime;
+            names.push(candidateNames[i]);
+        }
+        for (uint256 j = 0; j < _endPhases.length; j++) {
+            endPhases.push(_endPhases[j]);
+        }
         rewarded = false;
 
         for (uint256 j = 0; j < voterAddresses.length; j++) {
@@ -65,34 +63,49 @@ contract Ballot is Ownable {
         voters[voterAddress].vote = 0;
     }
 
-    function getPeriode() public view returns (uint256, uint256) {
-        return (startTime, endTime);
+    function getPhases() public view returns (uint256[] memory) {
+        return endPhases;
     }
 
-    function getCandidates() public view returns (Candidate[] memory) {
-        return candidates;
+    function getCandidates() public view returns (string[] memory) {
+        return names;
     }
 
     function getVoters() public view returns (address[] memory) {
         return voterAddresses;
     }
 
+    function getVoterCount() public view returns (uint256) {
+        return totalVoters;
+    }
+
+    function getVoteCount() public view returns (uint256) {
+        return totalVotes;
+    }
+
+    function getVoteCounts() public returns (uint256[] memory) {
+        for (uint256 i = 0; i < candidates.length; i++) {
+            voteCounts.push(candidates[i].voteCount);
+        }
+        return voteCounts;
+    }
+
     /**
      * @param candidateId start from 0
      */
     function castVote(
-        address voterAddress,
+        address voter,
         uint256 candidateId,
         uint256 currentTime
     ) public {
-        require(currentTime > startTime, "Voting hasn't started yet");
-        require(currentTime < endTime, "Voting has ended");
-        require(isExist(voterAddress), "Not an eligible voter");
-        require(!voters[voterAddress].voted, "Already voted");
+        require(currentTime > endPhases[1], "Voting hasn't started yet");
+        require(currentTime < endPhases[2], "Voting has ended");
+        // require(isExist(voter), "Not an eligible voter");
+        // require(!voters[voter].voted, "Already voted");
         require(candidates.length > candidateId, "Candidate doesn't exist");
 
-        voters[voterAddress].voted = true;
-        voters[voterAddress].vote = candidateId;
+        voters[voter].voted = true;
+        voters[voter].vote = candidateId;
 
         totalVotes = totalVotes + 1;
         candidates[candidateId].voteCount += 1;
@@ -115,7 +128,7 @@ contract Ballot is Ownable {
     function tallyResults(
         uint256 currentTime
     ) private returns (address[] memory, Candidate[] memory) {
-        require(currentTime > endTime, "Voting hasn't ended yet");
+        require(currentTime > endPhases[2], "Voting hasn't ended yet");
         require(voterTurnout() >= 60, "Not Enough voters");
 
         winningCandidates.push(Candidate(0, "", 0, 0));
@@ -148,7 +161,7 @@ contract Ballot is Ownable {
     function announceWinner(
         uint256 currentTime
     ) private view returns (string memory, uint256, uint256) {
-        require(currentTime > endTime, "Voting hasn't ended yet");
+        require(currentTime > endPhases[1], "Voting hasn't ended yet");
         string memory message;
 
         if (winningCandidates.length > 1) {
@@ -195,7 +208,7 @@ contract Ballot is Ownable {
     }
 
     function sendEther(address payable _to) public payable {
-        bool sent = _to.send(0.1 ether);
+        bool sent = _to.send(0.0001 ether);
         require(sent, "Failed to send Ether");
     }
 }
