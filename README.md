@@ -1,3 +1,6 @@
+Task file:
+https://github.com/dwsio/qoindigital-blockchain-technical-test/blob/main/img/Blockchain%20Engineer%20-%20Technical%20Test.pdf
+
 
 **Features**
 
